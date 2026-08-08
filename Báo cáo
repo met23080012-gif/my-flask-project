@@ -1,0 +1,47 @@
+1. AI ĐÃ HỖ TRỢ NHỮNG GÌ
+- Phân tích code ban đầu:	Đọc source code gốc (app.py chỉ có route /), chỉ ra đây chỉ là 1 route tĩnh, không có input → chưa đủ phạm vi để tạo tối thiểu 10 Test Case theo 5 nhóm yêu cầu
+- Thiết kế chức năng mới:	Đề xuất mở rộng thành Student Score Calculator: route /score, quy tắc validation (4 rule), quy tắc xếp loại 4 mức (Yếu/Trung bình/Khá/Giỏi), và giải thích tại sao mỗi validation cần thiết
+- Viết code baseline:	Viết app.py đúng theo spec đã thống nhất, giải thích từng dòng logic (đặc biệt là cách if/elif tuần tự tạo ra các khoảng xếp loại)
+- Hướng dẫn quy trình kỹ thuật:	Hướng dẫn cách chuẩn bị source code để upload an toàn (loại bỏ .env, venv/, .git/, __pycache__/), và hướng dẫn quy trình git push lên GitHub
+- Phân tích Root Cause khi Test Fail:	Khi test_TC18_nan_score_should_be_rejected fail (17 passed, 1 failed), AI truy vết logic từng dòng để xác định nguyên nhân kỹ thuật chính xác
+- Đề xuất phương án sửa:	Đưa ra 2 phương án (kiểm tra tường minh math.isnan()/math.isinf() vs. đảo điều kiện not (0<=score<=10)), so sánh ưu/nhược điểm, đề xuất phương án phù hợp nhất kèm giải thích
+- Audit trước khi nộp bài:	Rà soát cấu trúc GitHub repo, đối chiếu evidence với rubric giảng viên, chỉ ra khoảng trống về minh chứng (thiếu ảnh cho bước Root Cause Analysis giữa Test Fail và Fix)
+
+2. SINH VIÊN ĐÃ TỰ KIỂM TRA VÀ QUYẾT ĐỊNH GÌ
+- Duyệt kết luận phân tích trước khi mở rộng phạm vi
+- Duyệt thiết kế trước khi cho phép viết code
+- Tự chạy Automated Test và lấy kết quả thực tế, không dựa vào lời khẳng định của AI
+- Lựa chọn phương án sửa cụ thể giữa các phương án được đề xuất
+- Tự thực hiện thao tác kỹ thuật thực tế và đối chiếu kết quả thật: tự chạy git push -u origin main, và dán lại output thật của terminal (bao gồm dòng [new branch] main -> main) để AI xác nhận
+- Tự rà soát cấu trúc repository theo yêu cầu đề bài: đối chiếu cấu trúc GitHub thực tế của mình (app.py, requirements.txt, testing/TEST_PLAN.md, TEST_REPORT.md, evidence/) với checklist yêu cầu, và nhận diện được khoảng trống cụ thể: thiếu evidence minh chứng cho bước Root Cause Analysis (giữa 08_test_fail.png và 10_retest_all_pass.png).
+
+3. LỖI PHÁT HIỆN TRONG QUÁ TRÌNH LÀM
+- Test Case fail: test_TC18_nan_score_should_be_rejected
+def test_TC18_nan_score_should_be_rejected(client):
+    response = client.get("/score?score=nan")
+    assert response.status_code == 400
+- Kết quả pytest: 17 passed, 1 failed — AssertionError: assert 200 == 400
+Root Cause:
+float("nan") trong Python không raise ValueError như các chuỗi không phải số khác (VD: "abc"). Nó tạo ra giá trị đặc biệt NaN (Not a Number) theo chuẩn IEEE 754. Theo chuẩn này, mọi phép so sánh có thứ tự với NaN đều trả về False — kể cả nan < 0 và nan > 10.
+Vì vậy, điều kiện validate khoảng giá trị: if score < 0 or score > 10:
+không phát hiện được NaN (cả hai vế đều False), khiến score=nan "lọt qua" toàn bộ validation, rơi vào nhánh else của logic xếp loại → được gắn nhãn "Giỏi" và trả về 200 OK thay vì bị từ chối với 400.
+
+4. CÁCH SỬA
+- Thêm một bước kiểm tra tường minh ngay sau khi ép kiểu float() thành công, trước khi vào logic xếp loại:
+import math
+...
+try:
+    score = float(score_str)
+except ValueError:
+    return jsonify({"error": "Score must be a valid number"}), 400
+
+if math.isnan(score) or math.isinf(score):
+    return jsonify({"error": "Score must be a valid number"}), 400
+
+- Vì sao chọn cách này thay vì đảo điều kiện not (0 <= score <= 10):
+Cả hai cách đều reject được NaN, nhưng cách dùng math.isnan()/math.isinf() phản ánh đúng bản chất lỗi hơn: NaN không phải là "một điểm số nằm ngoài khoảng 0–10", mà là "không đại diện cho một con số hợp lệ nào cả". Vì vậy nó được gắn cùng nhóm lỗi với input "abc" (message "Score must be a valid number"), thay vì bị nhầm lẫn với lỗi out-of-range.
+
+- Vì sao fix này không làm hỏng 17 test đang pass:
+Đây là điều kiện được chèn thêm, không sửa đổi bất kỳ rule nào đã có. Với mọi input của 17 test case còn lại (số hữu hạn hợp lệ, hoặc input đã bị chặn từ Rule 1–3), math.isnan() và math.isinf() đều trả về False → điều kiện mới không kích hoạt → luồng xử lý giữ nguyên như cũ.
+
+- Kết quả sau khi fix: 18 passed (re-test toàn bộ, không chỉ riêng TC18, để đảm bảo không có regression).
