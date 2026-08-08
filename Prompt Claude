@@ -1,0 +1,168 @@
+I. "Bạn là Senior QA Engineer và Software Testing Mentor.
+Tôi đang thực hiện bài tập thực hành AI Workflow trong Software Testing.
+Bối cảnh:
+- Tôi là sinh viên và sử dụng Claude Web, không sử dụng Claude Code.
+- Tôi cần sử dụng AI để hỗ trợ phân tích code, tạo Test Case, Automated Test, phát hiện lỗi, sửa lỗi và Re-test.
+- Giảng viên yêu cầu sinh viên phải hiểu Test kiểm tra gì, tại sao Test Fail và tại sao cách sửa là phù hợp.
+- Mọi bước quan trọng cần có evidence screenshot.
+Tôi đã upload source code hiện tại của project.
+NHIỆM VỤ HIỆN TẠI:
+Chỉ PHÂN TÍCH code, chưa sửa code và chưa tạo Test Case.
+Hãy phân tích:
+1. Project hiện tại có những file/chức năng nào?
+2. Có những route/API/function nào?
+3. Với mỗi route/function:
+   - Input là gì?
+   - Output là gì?
+   - Expected behavior là gì?
+   - Có validation nào không?
+   - Có error handling nào không?
+4. Những phần nào cần được kiểm thử?
+5. Những rủi ro/bug tiềm ẩn nào có thể xảy ra?
+6. Project hiện tại có đủ phạm vi để tạo tối thiểu 10 Test Case gồm:
+   - Normal case
+   - Invalid data
+   - Empty data
+   - Boundary case
+   - Error handling
+   hay không?
+7. Nếu chưa đủ, hãy giải thích rõ vì sao và đề xuất phạm vi chức năng tối thiểu cần bổ sung.
+QUAN TRỌNG:
+- Không tự sửa code.
+- Không tạo Test Case ở bước này.
+- Không giả định chức năng không tồn tại trong source code.
+- Phải phân biệt rõ giữa những gì thực sự có trong code và đề xuất cải tiến.
+- Giải thích để một sinh viên mới học Testing có thể hiểu."
+
+II. "-Dựa trên kết quả phân tích source code ở bước trước, tôi đồng ý rằng project hiện tại chỉ có một route GET / và chưa đủ phạm vi để tạo tối thiểu 10 Test Case có ý nghĩa.
+Tôi muốn mở rộng project thành một ứng dụng Flask rất đơn giản có tên:
+"Student Score Calculator"
+Mục tiêu của ứng dụng:
+- Người dùng nhập điểm của một sinh viên.
+- Điểm hợp lệ nằm trong khoảng từ 0 đến 10.
+- Hệ thống kiểm tra dữ liệu đầu vào.
+- Nếu hợp lệ, hệ thống trả về điểm và xếp loại.
+- Nếu không hợp lệ, hệ thống trả về thông báo lỗi phù hợp.
+Tuy nhiên, ở bước này KHÔNG ĐƯỢC VIẾT CODE.
+Hãy chỉ thiết kế chức năng và logic.
+Hãy đề xuất:
+1. Các route/function cần có.
+2. Input của từng route/function.
+3. Output của từng route/function.
+4. Quy tắc validation.
+5. Quy tắc xếp loại điểm.
+6. Các trường hợp lỗi cần xử lý.
+7. Các Boundary Case cần kiểm thử.
+8. Một danh sách Test Scenario dự kiến có thể tạo được từ chức năng này.
+Đặc biệt:
+- Không tạo Test Case hoàn chỉnh ở bước này.
+- Không viết Python code.
+- Không tự thêm database, login hoặc chức năng phức tạp.
+- Thiết kế phải đủ đơn giản để một sinh viên mới học Flask và Software Testing có thể hiểu và tự giải thích.
+- Giải thích tại sao mỗi validation/error handling là cần thiết."
+
+III. "Dựa trên thiết kế Student Score Calculator đã được thống nhất ở bước trước, hãy viết code cho project Flask.
+Yêu cầu chức năng:
+1. Giữ nguyên route hiện tại:
+GET /
+→ trả về "Hello World"
+2. Thêm route:
+GET /score?score=<value>
+3. Quy tắc validation:
+- score phải được cung cấp
+- score không được rỗng
+- score phải là số
+- score phải nằm trong khoảng 0 đến 10
+- nếu không hợp lệ, HTTP status = 400
+4. Quy tắc xếp loại:
+- 0 <= score < 5 → "Yếu"
+- 5 <= score < 6.5 → "Trung bình"
+- 6.5 <= score < 8 → "Khá"
+- 8 <= score <= 10 → "Giỏi"
+5. Khi hợp lệ:
+HTTP status = 200
+Response JSON phải có:
+{
+    "score": ...,
+    "classification": "..."
+}
+6. Khi không hợp lệ:
+HTTP status = 400
+Response JSON phải có:
+{
+    "error": "..."
+}
+Yêu cầu kỹ thuật:
+- Chỉ dùng Flask, không dùng database.
+- Code phải đơn giản, dễ hiểu đối với sinh viên mới học Flask.
+- Giải thích từng phần code sau khi cung cấp code.
+- Không viết pytest ở bước này.
+- Không viết Test Case ở bước này.
+- Không thêm chức năng ngoài phạm vi trên.
+QUAN TRỌNG:
+Đây là phiên bản code đầu tiên để chuẩn bị cho Software Testing.
+Không cố tình làm sai logic.
+Hãy viết phiên bản baseline đúng theo specification ở trên."
+
+IV. "Bạn đóng vai Senior QA Engineer và Python/Flask Developer.
+Tôi đang thực hiện bài tập AI-assisted Software Testing.
+Ứng dụng của tôi là Student Score Calculator bằng Flask.
+Specification:
+- 0 <= score < 5 → "Yếu"
+- 5 <= score < 6.5 → "Trung bình"
+- 6.5 <= score < 8 → "Khá"
+- 8 <= score <= 10 → "Giỏi"
+Validation yêu cầu:
+- Thiếu score → HTTP 400
+- score rỗng → HTTP 400
+- score không phải số → HTTP 400
+- score ngoài khoảng 0–10 → HTTP 400
+- dữ liệu hợp lệ → HTTP 200
+Tôi có Automated Test:
+def test_TC18_nan_score_should_be_rejected(client):
+    response = client.get("/score?score=nan")
+    assert response.status_code == 400
+Kết quả pytest:
+17 passed, 1 failed
+Test fail:
+E assert 200 == 400
+Source code hiện tại:
+from flask import Flask, jsonify, request
+app = Flask(__name__)
+app.json.ensure_ascii = False
+@app.route("/")
+def home():
+    return "Hello World"
+@app.route("/score")
+def calculate_score():
+    score_str = request.args.get("score")
+    if score_str is None:
+        return jsonify({"error": "Score parameter is required"}), 400
+    if score_str.strip() == "":
+        return jsonify({"error": "Score cannot be empty"}), 400
+    try:
+        score = float(score_str)
+    except ValueError:
+        return jsonify({"error": "Score must be a valid number"}), 400
+    if score < 0 or score > 10:
+        return jsonify({"error": "Score must be between 0 and 10"}), 400
+    if score < 5:
+        classification = "Yếu"
+    elif score < 6.5:
+        classification = "Trung bình"
+    elif score < 8:
+        classification = "Khá"
+    else:
+        classification = "Giỏi"
+    return jsonify({"score": score, "classification": classification}), 200
+Nhiệm vụ:
+1. Phân tích chính xác tại sao TC18 bị FAIL.
+2. Xác định Root Cause trong source code.
+3. Giải thích tại sao float("nan") có thể khiến validation hiện tại không phát hiện lỗi.
+4. Không sửa code ngay.
+5. Đề xuất 2 cách sửa khác nhau.
+6. So sánh ưu/nhược điểm của 2 cách.
+7. Đề xuất cách sửa phù hợp nhất với bài toán này.
+8. Giải thích vì sao cách sửa được chọn không làm hỏng 17 Test Case đang PASS.
+9. Đề xuất thêm Test Case nếu cần để kiểm tra Infinity hoặc các giá trị đặc biệt tương tự.
+Tôi là sinh viên nên hãy giải thích dễ hiểu nhưng vẫn dùng thuật ngữ kỹ thuật chính xác."
